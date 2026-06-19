@@ -1,15 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- Prevent caching so it always picks a fresh random link -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
     <script>
-        window.location.href = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_MLFgVj9IVmyLVU3WjcRRM6ybORDLzL-my4qAGBrA9Z7LzMVFR0zqj4bX&s=10";
+        // List your 5 links here
+        const links = [
+            "https://www.google.com",
+            "https://www.wikipedia.org",
+            "https://www.github.com",
+            "https://www.openai.com",
+            "https://www.bing.com"
+        ];
+
+        // This picks a random link from the list
+        const randomLink = links[Math.floor(Math.random() * links.length)];
+        
+        // Redirect the user
+        window.location.href = randomLink;
     </script>
 </head>
 <body>
-    <p>Redirecting...</p>
+    <p>Redirecting you to a random destination...</p>
 </body>
 </html>
