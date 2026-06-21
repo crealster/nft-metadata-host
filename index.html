@@ -5,64 +5,105 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
-    <script>
-        const links = [
-            "https://www.youtube.com/watch?v=8Ms3mJFkSeg&list=PLWmVt_rgUljE8rhnsS8Hn70oAhwldkGi2&index=1",
-            "https://www.youtube.com/watch?v=7e72sMIsKdg&list=PLWmVt_rgUljE8rhnsS8Hn70oAhwldkGi2&index=2",
-            "https://www.youtube.com/watch?v=8Ms3mJFkSeg&list=PLWmVt_rgUljE8rhnsS8Hn70oAhwldkGi2&index=3",
-            "https://www.youtube.com/watch?v=8Ms3mJFkSeg&list=PLWmVt_rgUljE8rhnsS8Hn70oAhwldkGi2&index=4",
-            "https://www.youtube.com/watch?v=8Ms3mJFkSeg&list=PLWmVt_rgUljE8rhnsS8Hn70oAhwldkGi2&index=5"
-        ];
-
-        // Helper: Finds the Nth occurrence of a specific weekday in a month (0=Sun, 6=Sat)
-        function getNthWeekday(year, month, weekday, n) {
-            let date = new Date(year, month, 1);
-            let dayCount = 0;
-            while (date.getMonth() === month) {
-                if (date.getDay() === weekday) {
-                    dayCount++;
-                    if (dayCount === n) return date;
-                }
-                date.setDate(date.getDate() + 1);
-            }
-            return null;
+    <style>
+        .container { 
+            position: relative; 
+            text-align: center; 
+            color: white; 
+            font-family: 'Segoe UI', sans-serif; 
+            max-width: 800px; 
+            margin: 50px auto; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            overflow: hidden;
         }
-
-        function getRedirectUrl() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const todayStr = `${now.getMonth()}-${now.getDate()}`;
-
-            // Define dynamic holidays
-            const holidays = [
-                { // Mother's Day: 2nd Sunday in May (Month 4)
-                    date: getNthWeekday(year, 4, 0, 2),
-                    url: "https://www.youtube.com/watch?v=MOTHERS_DAY_LINK"
-                },
-                { // Father's Day: 3rd Sunday in June (Month 5)
-                    date: getNthWeekday(year, 5, 0, 3),
-                    url: "https://www.youtube.com/watch?v=FATHERS_DAY_LINK"
-                },
-                { // Fixed date example: Christmas (Dec 25)
-                    date: new Date(year, 11, 25),
-                    url: "https://www.youtube.com/watch?v=CHRISTMAS_LINK"
-                }
-            ];
-
-            // Check if today matches any holiday
-            for (let h of holidays) {
-                if (h.date && `${h.date.getMonth()}-${h.date.getDate()}` === todayStr) {
-                    return h.url;
-                }
-            }
-            
-            return links[Math.floor(Math.random() * links.length)];
+        #displayImage { width: 100%; display: block; }
+        .quote-overlay { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: rgba(0, 0, 0, 0.6); 
+            padding: 20px; 
+            border-radius: 10px; 
+            font-size: 24px; 
+            width: 80%;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-
-        window.location.href = getRedirectUrl();
-    </script>
+    </style>
 </head>
 <body>
-    <p>Redirecting...</p>
+
+    <div class="container">
+        <img id="displayImage" src="" alt="Dynamic Content">
+        <div class="quote-overlay" id="displayQuote"></div>
+    </div>
+
+    <script>
+        const today = new Date();
+        const year = today.getFullYear();
+
+        // --- Configuration: Add your image/quote URLs and text here ---
+        const generalImages = [
+            "https://picsum.photos/800/500?random=1",
+            "https://picsum.photos/800/500?random=2",
+            "https://picsum.photos/800/500?random=3"
+        ];
+
+        const generalQuotes = [
+            "Focus on the step in front of you.",
+            "Every day is a new beginning.",
+            "Keep going, keep growing.",
+            "Success is the sum of small efforts.",
+            "Dream big, work hard."
+        ];
+
+        // --- Logic Helper Functions ---
+        function getNthDayOfMonth(n, dayOfWeek, month, year) {
+            let date = new Date(year, month, 1);
+            let count = 0;
+            while (count < n) {
+                if (date.getDay() === dayOfWeek) count++;
+                if (count < n) date.setDate(date.getDate() + 1);
+            }
+            return date.toDateString();
+        }
+
+        function getEasterDate(year) {
+            const f = Math.floor, G = year % 19, C = f(year / 100), H = (C - f(C / 4) - f((8 * C + 13) / 25) + 19 * G + 15) % 30, I = H - f(H / 28) * (1 - f(29 / (H + 1)) * f((21 - G) / 11)), J = (year + f(year / 4) + I + 2 - C + f(C / 4)) % 7, L = I - J, month = 3 + f((L + 40) / 44), day = L + 28 - 31 * f(month / 4);
+            return (new Date(year, month - 1, day)).toDateString();
+        }
+
+        // --- Holiday Dictionary ---
+        const holidays = {
+            [getEasterDate(year)]: { img: "https://via.placeholder.com/800x500/FFFF00/000?text=Happy+Easter", quote: "Easter is a time for hope and renewal." },
+            [(new Date(year, 0, 1)).toDateString()]: { img: "https://via.placeholder.com/800x500/000/FFF?text=Happy+New+Year", quote: "Cheers to a new year!" },
+            [(new Date(year, 1, 14)).toDateString()]: { img: "https://via.placeholder.com/800x500/FF0000/FFF?text=Happy+Valentines", quote: "Love is the greatest gift." },
+            [getNthDayOfMonth(2, 0, 4, year)]: { img: "https://via.placeholder.com/800x500/FFC0CB/000000?text=Mothers+Day", quote: "To the world you are a mother, but to your family you are the world." },
+            [(function(){ let d = new Date(year, 5, 1); while(d.getDay() !== 1) d.setDate(d.getDate()+1); d.setDate(d.getDate()-7); return d.toDateString(); })()]: { img: "https://via.placeholder.com/800x500/000080/FFF?text=Memorial+Day", quote: "Honoring the brave." },
+            [getNthDayOfMonth(3, 0, 5, year)]: { img: "https://via.placeholder.com/800x500/ADD8E6/000000?text=Fathers+Day", quote: "A father is someone you look up to." },
+            [(new Date(year, 6, 4)).toDateString()]: { img: "https://via.placeholder.com/800x500/FF0000/FFF?text=Independence+Day", quote: "Freedom lies in being bold." },
+            [(new Date(year, 9, 31)).toDateString()]: { img: "https://via.placeholder.com/800x500/FFA500/000?text=Halloween", quote: "Spooky season is here!" },
+            [getNthDayOfMonth(4, 4, 10, year)]: { img: "https://via.placeholder.com/800x500/A52A2A/FFF?text=Thanksgiving", quote: "Gratitude is the heart's memory." },
+            [(new Date(year, 11, 25)).toDateString()]: { img: "https://via.placeholder.com/800x500/FF0000/FFFFFF?text=Merry+Christmas", quote: "May your holidays be filled with joy." }
+        };
+
+        // --- Main Execution ---
+        function loadContent() {
+            const todayStr = today.toDateString();
+            const imgEl = document.getElementById("displayImage");
+            const quoteEl = document.getElementById("displayQuote");
+
+            if (holidays[todayStr]) {
+                imgEl.src = holidays[todayStr].img;
+                quoteEl.innerText = holidays[todayStr].quote;
+            } else {
+                imgEl.src = generalImages[Math.floor(Math.random() * generalImages.length)];
+                quoteEl.innerText = generalQuotes[Math.floor(Math.random() * generalQuotes.length)];
+            }
+        }
+
+        window.onload = loadContent;
+    </script>
 </body>
 </html>
