@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Prevent caching so it always picks a fresh random link -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
     <script>
-        // List your 5 links here
         const links = [
             "https://www.youtube.com/watch?v=8Ms3mJFkSeg&list=PLWmVt_rgUljE8rhnsS8Hn70oAhwldkGi2&index=1",
             "https://www.youtube.com/watch?v=7e72sMIsKdg&list=PLWmVt_rgUljE8rhnsS8Hn70oAhwldkGi2&index=2",
@@ -16,14 +14,55 @@
             "https://www.youtube.com/watch?v=8Ms3mJFkSeg&list=PLWmVt_rgUljE8rhnsS8Hn70oAhwldkGi2&index=5"
         ];
 
-        // This picks a random link from the list
-        const randomLink = links[Math.floor(Math.random() * links.length)];
-        
-        // Redirect the user
-        window.location.href = randomLink;
+        // Helper: Finds the Nth occurrence of a specific weekday in a month (0=Sun, 6=Sat)
+        function getNthWeekday(year, month, weekday, n) {
+            let date = new Date(year, month, 1);
+            let dayCount = 0;
+            while (date.getMonth() === month) {
+                if (date.getDay() === weekday) {
+                    dayCount++;
+                    if (dayCount === n) return date;
+                }
+                date.setDate(date.getDate() + 1);
+            }
+            return null;
+        }
+
+        function getRedirectUrl() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const todayStr = `${now.getMonth()}-${now.getDate()}`;
+
+            // Define dynamic holidays
+            const holidays = [
+                { // Mother's Day: 2nd Sunday in May (Month 4)
+                    date: getNthWeekday(year, 4, 0, 2),
+                    url: "https://www.youtube.com/watch?v=MOTHERS_DAY_LINK"
+                },
+                { // Father's Day: 3rd Sunday in June (Month 5)
+                    date: getNthWeekday(year, 5, 0, 3),
+                    url: "https://www.youtube.com/watch?v=FATHERS_DAY_LINK"
+                },
+                { // Fixed date example: Christmas (Dec 25)
+                    date: new Date(year, 11, 25),
+                    url: "https://www.youtube.com/watch?v=CHRISTMAS_LINK"
+                }
+            ];
+
+            // Check if today matches any holiday
+            for (let h of holidays) {
+                if (h.date && `${h.date.getMonth()}-${h.date.getDate()}` === todayStr) {
+                    return h.url;
+                }
+            }
+            
+            return links[Math.floor(Math.random() * links.length)];
+        }
+
+        window.location.href = getRedirectUrl();
     </script>
 </head>
 <body>
-    <p>Redirecting you to a random destination...</p>
+    <p>Redirecting...</p>
 </body>
 </html>
